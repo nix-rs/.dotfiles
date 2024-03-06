@@ -1,43 +1,88 @@
+" Use Vim settings, rather than Vi settings
+set nocompatible
+set backspace=2
 set number
-set cursorline					" Highlight the current line of the cursor
+set cursorline
+set cursorcolumn
 "set cursorlineopt=number
-set laststatus=2				" Always show status line
-set mouse=a	  					" Enable mouse in all modes
-set nocompatible               " Use Vim settings, rather than Vi settings
-set relativenumber             " Show relative line number
-set showcmd                    " Display incomplete commands
-"set signcolumn=yes            " Always display sign column
-set tabstop=8                  " Number of spaces that Tab in file uses
-set wildmenu                   " Display completion matches in a status line
+" Always show status line
+set laststatus=2
+" Enable mouse in all modes
+set mouse=a	  				
+set relativenumber
+"Display incomplete commands
+set showcmd
+" Always display sign column
+"set signcolumn=yes
+" Number of spaces that Tab in file uses
+set tabstop=4
+set shiftwidth=4 smarttab
+" Display completion matches in a status line
+set wildmenu
+" Make wildmenu behave like similar to Bash completion.
+" set wildmode=list:longest
+" There are certain files that we would never want to edit with Vim.
+" Wildmenu will ignore files with these extensions.
+set wildignore=*.docx,*.jpg,*.png,*.gif,*.pdf,*.pyc,*.exe,*.flv,*.img,*.xlsx
 "set termcolorgui
 set termguicolors
-filetype plugin indent on      " Enable file type detection
-syntax on                      " Turn on syntax highlighting
-"""""""""""""""""""""""""""""""""""""
+" Enable file type detection
+filetype on
+filetype plugin on
+filetype indent on
+" Turn on syntax highlighting
+syntax on
+" Folding
+set conceallevel=2
+setlocal foldmethod=indent
+" While searching though a file incrementally highlight matching characters as you type.
+set incsearch
+" Ignore capital letters during search.
+set ignorecase
+" Show matching words during a search.
+set showmatch
+" Use highlighting when doing a search.
+set hlsearch
+"""""""""""""""""""""""""""""""""""""""""
+"     nnoremap – Allows you to map keys in normal mode.
+"     inoremap – Allows you to map keys in insert mode.
+"     vnoremap – Allows you to map keys in visual mode.
+""""""""""""""""""""""""""""""""""""""""     
 
-
-" Jumps to the last known position in a file after opening it
-function! ResCur()
-		if line("'\"") <= line("$")
-				normal! g`"
-				return 1
-		endif
-endfunction
-augroup resCur
-		autocmd!
-		autocmd BufWinEnter * call ResCur()
+"Save folds after exting the files
+augroup remember_folds
+  autocmd!
+  autocmd BufWinLeave * mkview
+  autocmd BufWinEnter * silent! loadview
 augroup END
 
+" Enable the marker method of folding.
+augroup filetype_vim
+    autocmd!
+    autocmd FileType vim setlocal foldmethod=marker
+augroup END
+
+" Display cursorline and cursorcolumn ONLY in active window.
+augroup cursor_off
+    autocmd!
+    autocmd WinLeave * set nocursorline nocursorcolumn
+    autocmd WinEnter * set cursorline cursorcolumn
+augroup END
+
+" This allows you to undo changes to a file even after saving it.
+if version >= 703
+    set undodir=~/.vim/backup
+    set undofile
+    set undoreload=10000
+endif
+
 " Change cursor shape in different modes
-let &t_EI = "\033[2 q" " NORMAL  █
-let &t_SI = "\033[5 q" " INSERT  |
-let &t_SR = "\033[3 q" " REPLACE _
-
-
-" Save and quit
-"cmap sudow w !sudo /usr/bin/tee > /dev/null %
-"nnoremap <C-S> :w<CR>
-"nnoremap <C-Q> :q<CR>
+" NORMAL  █
+let &t_EI = "\033[2 q"
+" INSERT  |
+let &t_SI = "\033[5 q"
+" REPLACE _
+let &t_SR = "\033[3 q" 
 
 " Buffer
 nnoremap <C-t> :Files<CR>
@@ -45,64 +90,70 @@ nnoremap <TAB> :bnext<CR>
 nnoremap <S-TAB> :bprev<CR>
 "nnoremap <LEADER>d :bp<CR>:bd #<CR>
 
-" Copy and paste with system clipboard
-"vmap <C-c> "+y
-"vmap <C-v> c<ESC>"+p
-"imap <C-v> <ESC>"+pa
-
 " xHTML Tag Closing Shorcut
 " just press TAB after the opening tab
 inoremap ><Tab> ><Esc>F<lyt>o</<C-r>"><Esc>O<Space>
 
+" If the current file type is HTML, set indentation to 2 spaces.
+autocmd Filetype html setlocal tabstop=2 shiftwidth=2 expandtab
+
+" Split the window in Vim by typing :split or :vsplit.
+" Navigate the split view easier by pressing CTRL+j, CTRL+k, CTRL+h, or CTRL+l.
+nnoremap <c-j> <c-w>j
+nnoremap <c-k> <c-w>k
+nnoremap <c-h> <c-w>h
+nnoremap <c-l> <c-w>l
+
+" Resize split windows using arrow keys by pressing:
+" CTRL+UP, CTRL+DOWN, CTRL+LEFT, or CTRL+RIGHT.
+noremap <c-up> <c-w>+
+noremap <c-down> <c-w>-
+noremap <c-left> <c-w>>
+noremap <c-right> <c-w><
+
+
 
 """"""""""""""""""""""""""""""""""""
-
 call plug#begin()
-
-Plug 'vim-airline/vim-airline' 			" Theme
-Plug 'vim-airline/vim-airline-themes' 	" Theme
-Plug 'preservim/nerdtree'
-Plug 'ryanoasis/vim-devicons' 			" UI- icons
+" Theme & UI
+Plug 'morhetz/gruvbox' 
+Plug 'luochen1990/rainbow' 
+Plug 'pineapplegiant/spaceduck', { 'branch': 'main' } 
+Plug 'sjl/badwolf'
+Plug 'ayu-theme/ayu-vim'  				
+Plug 'iibe/gruvbox-high-contrast' 
+Plug 'NLKNguyen/papercolor-theme'
+Plug 'bignimbus/pop-punk.vim' 
+Plug 'jaredgorski/spacecamp'
+Plug 'srcery-colors/srcery-vim' 
+Plug 'ghifarit53/tokyonight-vim'
+Plug 'ajmwagar/vim-deus' 
+Plug 'fxn/vim-monochrome'
+Plug 'maxmellon/vim-jsx-pretty'
+Plug 'powerline/fonts' 
+Plug 'ryanoasis/vim-devicons' 
+Plug 'jonathanfilip/vim-lucius'
+Plug 'flazz/vim-colorschemes'
+Plug 'vim-airline/vim-airline' 
+Plug 'vim-airline/vim-airline-themes' 
+" Utils
 Plug 'rust-lang/rust.vim'
-Plug 'jonathanfilip/vim-lucius'			" Theme
-Plug 'flazz/vim-colorschemes'			" Theme : ** : molokai
-Plug 'sheerun/vim-polyglot'				" Language pack
-Plug 'powerline/fonts' 					" UI-line
-Plug 'drmikehenry/vim-fontsize'
-Plug 'vim-syntastic/syntastic'			" Syntax checking
-"Plug 'ryanoasis/nerd-fonts'
-Plug 'tunegunn/fzf'
-Plug 'morhetz/gruvbox' 					" Theme
-Plug 'luochen1990/rainbow' 				" UI-bracket
-Plug 'yggdroot/indentline' 				" UI-indent
-Plug 't9md/vim-choosewin'
-Plug 'spolu/dwm.vim'
+Plug 'sheerun/vim-polyglot'
+Plug 'junegunn/fzf'
+Plug 'dense-analysis/ale'
 Plug 'justinmk/vim-sneak'
 Plug 'tpope/vim-fugitive'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
-Plug 'pineapplegiant/spaceduck', { 'branch': 'main' } 	" Theme
-Plug 'thaerkh/vim-workspace'
-Plug 'sjl/badwolf' 						" Theme
-Plug 'ayu-theme/ayu-vim'  				" Theme
-Plug 'jiangmiao/auto-pairs' 			" !!!! deleting extra lines
-Plug 'iibe/gruvbox-high-contrast' 		" Theme
-Plug 'NLKNguyen/papercolor-theme' 		" Theme
-Plug 'bignimbus/pop-punk.vim' 			" Theme
-Plug 'jaredgorski/spacecamp' 			" Theme
-Plug 'srcery-colors/srcery-vim' 		" Theme
-Plug 'ghifarit53/tokyonight-vim' 		" Theme
-Plug 'ajmwagar/vim-deus' 				" Theme
-Plug 'fxn/vim-monochrome' 				" Theme
-Plug 'majutsushi/tagbar'
+Plug 'jiangmiao/auto-pairs' 
 Plug 'tomtom/tcomment_vim'
-Plug 'maxmellon/vim-jsx-pretty'
-" Plug 'alvan/vim-closetag'
-Plug 'rstacruz/sparkup' 		" Util : HTML completion
-Plug 'mattn/emmet-vim' 			" Util : Web Development
+Plug 'Yggdroot/indentLine'
+Plug 'rstacruz/sparkup'
+Plug 'mattn/emmet-vim'
+Plug 'vim-scripts/vim-auto-save'
 call plug#end()
 
 " Sparkup
-"" div#header then press Ctrl + E 
+"" div#header then press Ctrl + E
 	"" <div id='header'></div>
 
 """"""""""""""""""""""""""""""""""""""
@@ -113,7 +164,7 @@ call plug#end()
 
 " Deus
 " let g:airline_theme = 'deus'
-" set background=dark    " Setting dark mode
+" set background=dark
 " colorscheme deus
 
 
@@ -175,9 +226,9 @@ colorscheme spaceduck
 
 
 " ayu congif
-"let ayucolor="light"  " for light version of theme
-"let ayucolor="mirage" " for mirage version of theme
-"let ayucolor="dark"   " for dark version of theme
+"let ayucolor="light"
+"let ayucolor="mirage" 
+"let ayucolor="dark"
 "colorscheme ayu
 
 
@@ -215,16 +266,43 @@ colorscheme spaceduck
 "colorscheme badwolf
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Vim Auto Save
+"enable AutoSave on Vim startup
+let g:auto_save = 1  
+" do not change the 'updatetime' option
+let g:auto_save_no_updatetime = 1
+" do not save while in insert mode
+let g:auto_save_in_insert_mode = 0  
 
-" Tagbar
-nmap <F7> :TagbarToggle<CR>
+" ALE
+let g:ale_sign_error = '>>'
+let g:ale_sign_warning = '*'
+let b:ale_fixers = {'rust': ['prettier', 'eslint', 'rustfmt --force']}
+" Set this variable to 1 to fix files when you save them.
+" let g:ale_fix_on_save = 1
+" " Disable whitespace warnings
+"let g:ale_warn_about_trailing_whitespace = 0
+let g:ale_virtualtext_cursor = 'current'
+" let g:ale_virtualtext_cursor = 'disabled'
+" Set this. Airline will handle the rest.
+let g:airline#extensions#ale#enabled = 1
+let g:ale_floating_window_border = ['│', '─', '╭', '╮', '╯', '╰', '│', '─']
+let g:ale_disable_lsp = 1
+nmap <silent> <C-k> <Plug>(ale_previous_wrap)
+nmap <silent> <C-j> <Plug>(ale_next_wrap)
+let g:ale_lint_on_insert_leave = 1
+
+" IndentLine
+let g:indentLine_char = '┆'
+let g:indentLine_enabled = 1
+let g:indentLine_setColors = 1
+let g:indentLine_bgcolor_term = 11
+let g:indentLine_color_term = 10
+" let g:indentLine_char_list = ['|', '¦', '┆', '┊']
 
 " AutoPairs
 let g:AutoPairsFlyMode = 0
 let g:AutoPairsShortcutBackInsert = '<M-b>'
-
-" Vim-WorkSpace
-let g:workspace_autosave_always = 1
 
 " Rainbow Parenthsis
 let g:rainbow_active = 1
@@ -232,46 +310,13 @@ let g:rainbow_active = 1
 " Sneak
 let g:sneak#label = 1
 
-" Indent Line
-let g:indentLine_setColors = 1
-let g:indentLine_enabled = 1
-let g:indentLine_bgcolor_term = 202
-let g:indentLine_color_term = 239
-"let g:indentLine_char_list = ['|', '¦', '┆', '┊']
-
-" ChooseWin
-" invoke with '-'
-nmap  -  <Plug>(choosewin)
-
-
-" CtrlP
-set runtimepath^=~/.vim/bundle/ctrlp.vim
-let g:ctrlp_map = '<c-p>'
-let g:ctrlp_cmd = 'CtrlP'
-
-
-" Vim-airline 
+" Vim-airline
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#left_sep = ' '
 let g:airline#extensions#tabline#left_alt_sep = '|'
-"let g:airline_statusline_ontop=1        "to place status ontop
+"let g:airline_statusline_ontop=1
 "let g:airline_theme='simple'
 
-" NerdTree
-nnoremap <leader>n :NERDTreeFocus<CR>
-nnoremap <C-n> :NERDTree<CR>
-nnoremap <C-t> :NERDTreeToggle<CR>
-nnoremap <C-f> :NERDTreeFind<CR>
-
-" Syntastic
-set statusline+=%#warningmsg#
-set statusline+=%{SyntasticStatuslineFlag()}
-set statusline+=%*
-let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_auto_loc_list = 1
-let g:syntastic_check_on_open = 1
-let g:syntastic_check_on_wq = 0
-let g:syntastic_toggle_mode = 0
 
 " Coc-nvim
 
@@ -430,12 +475,3 @@ nnoremap <silent><nowait> <space>j  :<C-u>CocNext<CR>
 nnoremap <silent><nowait> <space>k  :<C-u>CocPrev<CR>
 " Resume latest coc list
 nnoremap <silent><nowait> <space>p  :<C-u>CocListResume<CR>
-
-
-
-" Exit Vim if NERDTree is the only window remaining in the only tab.
-autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
-
-
-
-
